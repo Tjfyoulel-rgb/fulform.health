@@ -1,44 +1,706 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FulForm Health | Automation Solutions</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1E3A5F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WordBridge">
+<title>WordBridge ESL</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --sky: #1E3A5F;
+  --sky-mid: #2E5B8E;
+  --sky-light: #5B9BD5;
+  --sky-pale: #EBF4FF;
+  --sun: #F5A623;
+  --sun-pale: #FFF8EC;
+  --grass: #2D7D46;
+  --grass-pale: #E8F5EC;
+  --coral: #E8533A;
+  --coral-pale: #FFF0EE;
+  --ink: #1A1F2E;
+  --ink-soft: #3D4558;
+  --ink-faint: #8892A4;
+  --white: #FFFFFF;
+  --bg: #F4F7FB;
+  --border: rgba(30,58,95,0.10);
+  --nav-h: 72px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --font: -apple-system, 'Segoe UI', system-ui, sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --r: 20px;
+  --r-sm: 12px;
+  --shadow: 0 2px 12px rgba(30,58,95,0.08), 0 8px 32px rgba(30,58,95,0.06);
+  --shadow-lg: 0 6px 20px rgba(30,58,95,0.12), 0 20px 48px rgba(30,58,95,0.10);
+}
+
+html, body { height: 100%; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--ink);
+  padding-bottom: calc(var(--nav-h) + var(--safe-b));
+  overflow-x: hidden;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--sky);
+  padding: 14px 20px;
+  padding-top: calc(14px + env(safe-area-inset-top, 0px));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+.logo { font-family: var(--font-serif); font-size: 20px; font-weight: 700; color: var(--white); }
+.logo em { color: #7EC8E3; font-style: normal; }
+.hdr-right { display: flex; align-items: center; gap: 10px; }
+.known-pill { font-size: 13px; font-weight: 700; color: #7EC8E3; }
+.offline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sun); display: none; box-shadow: 0 0 0 3px rgba(245,166,35,0.25); }
+.offline-dot.show { display: block; }
+
+/* ── BOTTOM NAV ── */
+nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: calc(var(--nav-h) + var(--safe-b));
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: flex-start; padding-top: 6px;
+  z-index: 100;
+  box-shadow: 0 -2px 16px rgba(30,58,95,0.07);
+}
+.nb {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 8px 4px 0; border: none; background: transparent; cursor: pointer; min-height: 52px;
+}
+.nb-icon { font-size: 26px; line-height: 1; transition: transform 0.2s; }
+.nb-label { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--ink-faint); transition: color 0.18s; }
+.nb.active .nb-icon { transform: scale(1.12); }
+.nb.active .nb-label { color: var(--sky); }
+
+/* ── VIEWS ── */
+.view { display: none; max-width: 560px; margin: 0 auto; padding: 20px 16px; animation: up 0.22s ease; }
+.view.active { display: block; }
+@keyframes up { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+.slabel { font-size: 10px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 10px; }
+
+/* ── CATEGORIES ── */
+.cat-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 22px; scrollbar-width: none; }
+.cat-scroll::-webkit-scrollbar { display: none; }
+.cat-chip {
+  flex-shrink: 0; padding: 8px 16px; border-radius: 100px;
+  border: 1.5px solid var(--border); background: var(--white);
+  font-size: 14px; font-weight: 600; color: var(--ink-soft);
+  cursor: pointer; white-space: nowrap; transition: all 0.18s;
+}
+.cat-chip.active { background: var(--sky); border-color: var(--sky); color: var(--white); }
+
+/* ── PROGRESS ── */
+.prog-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.prog-text { font-size: 12px; font-weight: 600; color: var(--ink-faint); }
+.prog-bar { height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 18px; overflow: hidden; }
+.prog-fill { height: 100%; background: var(--sky-light); border-radius: 2px; transition: width 0.4s ease; }
+
+/* ── FLASHCARD ── */
+.card-wrap {
+  perspective: 1400px; margin-bottom: 18px;
+  cursor: pointer; user-select: none; -webkit-user-select: none;
+}
+.card-inner {
+  position: relative; width: 100%; height: 340px;
+  transform-style: preserve-3d;
+  transition: transform 0.52s cubic-bezier(0.35, 0.15, 0.15, 1);
+  border-radius: var(--r);
+}
+@media (min-height: 720px) { .card-inner { height: 380px; } }
+.card-inner.flipped { transform: rotateY(180deg); }
+
+.card-face {
+  position: absolute; inset: 0; border-radius: var(--r);
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 24px 20px; box-shadow: var(--shadow-lg);
+}
+
+/* FRONT */
+.card-front { background: var(--white); border: 1px solid var(--border); }
+.card-cat-tag { font-size: 10px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 12px; }
+.card-picture { font-size: 108px; line-height: 1; margin-bottom: 14px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.08)); }
+.card-word { font-family: var(--font-serif); font-size: 36px; font-weight: 700; color: var(--ink); text-align: center; margin-bottom: 14px; letter-spacing: -0.5px; }
+.card-hint { font-size: 12px; color: var(--ink-faint); margin-top: 4px; }
+
+/* BACK */
+.card-back { transform: rotateY(180deg); }
+.card-back[data-col="food"]    { background: linear-gradient(145deg,#E8533A,#F5A623); }
+.card-back[data-col="home"]    { background: linear-gradient(145deg,#2D7D46,#5B9BD5); }
+.card-back[data-col="travel"]  { background: linear-gradient(145deg,#2E5B8E,#2D7D46); }
+.card-back[data-col="animals"] { background: linear-gradient(145deg,#F5A623,#E8533A); }
+.card-back[data-col="weather"] { background: linear-gradient(145deg,#2E5B8E,#5B9BD5); }
+.card-back[data-col="work"]    { background: linear-gradient(145deg,#3D4558,#2E5B8E); }
+.card-back[data-col="clothes"] { background: linear-gradient(145deg,#6B4FA0,#E8533A); }
+
+.back-pic-sm { font-size: 52px; line-height: 1; margin-bottom: 8px; opacity: 0.3; }
+.back-word { font-family: var(--font-serif); font-size: 42px; font-weight: 700; color: var(--white); text-align: center; margin-bottom: 6px; }
+.back-phon { font-family: 'Courier New', monospace; font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 14px; }
+.back-example {
+  font-size: 15px; color: rgba(255,255,255,0.9); text-align: center;
+  font-style: italic; line-height: 1.55; max-width: 280px;
+  padding: 10px 14px; background: rgba(0,0,0,0.18); border-radius: var(--r-sm);
+}
+
+/* ── AUDIO BTN ── */
+.audio-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 20px; border-radius: 100px;
+  border: 2px solid var(--sky); background: transparent; color: var(--sky);
+  font-family: var(--font); font-size: 14px; font-weight: 700;
+  cursor: pointer; min-height: 44px; transition: all 0.18s; margin-top: 12px;
+}
+.audio-btn:active { transform: scale(0.95); }
+.audio-btn.light { border-color: rgba(255,255,255,0.5); color: rgba(255,255,255,0.9); }
+.audio-btn.speaking { background: var(--sky); color: var(--white); }
+.audio-btn.light.speaking { background: rgba(255,255,255,0.2); border-color: white; color: white; }
+
+/* ── CARD CONTROLS ── */
+.card-controls { display: flex; gap: 10px; align-items: center; justify-content: center; }
+.ctrl-btn {
+  width: 52px; height: 52px; border-radius: 50%;
+  border: 1.5px solid var(--border); background: var(--white);
+  font-size: 20px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow); flex-shrink: 0; transition: all 0.18s;
+}
+.ctrl-btn:active { transform: scale(0.92); }
+.knew-btn {
+  flex: 1; max-width: 200px; height: 52px; border-radius: 100px;
+  border: none; background: var(--sky); color: var(--white);
+  font-family: var(--font); font-size: 15px; font-weight: 800;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+  box-shadow: 0 4px 14px rgba(30,58,95,0.25); transition: all 0.18s;
+}
+.knew-btn:active { transform: scale(0.96); background: var(--sky-mid); }
+
+/* ── SENTENCE BUILDER ── */
+.sb-card {
+  background: var(--white); border-radius: var(--r);
+  padding: 20px; box-shadow: var(--shadow);
+  border: 1px solid var(--border); margin-bottom: 14px;
+}
+.sb-card h3 { font-family: var(--font-serif); font-size: 19px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.sb-card > p { font-size: 13px; color: var(--ink-faint); line-height: 1.5; margin-bottom: 16px; }
+
+.sb-prompt-box {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--sky-pale); border-radius: var(--r-sm);
+  padding: 12px 16px; margin-bottom: 16px;
+}
+.sb-prompt-pic { font-size: 48px; line-height: 1; flex-shrink: 0; }
+.sb-prompt-text { font-size: 14px; color: var(--sky); font-weight: 600; line-height: 1.4; }
+.sb-prompt-text em { font-style: normal; font-size: 12px; font-weight: 500; opacity: 0.75; display: block; margin-top: 3px; }
+
+.word-bank { display: flex; flex-wrap: wrap; gap: 8px; min-height: 44px; margin-bottom: 14px; }
+.w-chip {
+  padding: 10px 16px; border-radius: 100px;
+  background: var(--bg); border: 1.5px solid var(--border);
+  font-size: 15px; font-weight: 600; color: var(--ink);
+  cursor: pointer; min-height: 44px; display: flex; align-items: center; transition: all 0.15s;
+}
+.w-chip:active { transform: scale(0.94); }
+.w-chip.used { opacity: 0.22; pointer-events: none; }
+
+.sent-drop {
+  min-height: 56px; border: 2px dashed rgba(30,58,95,0.15);
+  border-radius: var(--r-sm); padding: 10px 12px;
+  display: flex; flex-wrap: wrap; gap: 7px; align-items: center;
+  margin-bottom: 14px; background: var(--bg); transition: border-color 0.2s, background 0.2s;
+}
+.sent-drop.has { border-color: var(--sky-light); background: var(--sky-pale); }
+
+.p-chip {
+  padding: 9px 14px; border-radius: 100px;
+  background: var(--sky); color: var(--white);
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  min-height: 40px; display: flex; align-items: center; gap: 5px; transition: all 0.15s;
+}
+.p-chip:active { transform: scale(0.94); background: var(--sky-mid); }
+.p-chip .x { font-size: 11px; opacity: 0.6; }
+.drop-ph { font-size: 13px; color: var(--ink-faint); font-style: italic; }
+
+.sb-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-check {
+  flex: 1; min-height: 48px; border-radius: var(--r-sm);
+  border: none; background: var(--sky); color: var(--white);
+  font-family: var(--font); font-size: 15px; font-weight: 800;
+  cursor: pointer; box-shadow: 0 4px 12px rgba(30,58,95,0.2); transition: all 0.18s;
+}
+.btn-check:active { background: var(--sky-mid); transform: scale(0.98); }
+.btn-check:disabled { opacity: 0.4; pointer-events: none; }
+.btn-sec {
+  min-height: 48px; padding: 0 18px; border-radius: var(--r-sm);
+  border: 1.5px solid var(--border); background: var(--white);
+  font-family: var(--font); font-size: 14px; font-weight: 600; color: var(--ink-soft);
+  cursor: pointer; transition: all 0.18s;
+}
+.btn-sec:active { background: var(--bg); }
+
+.ai-fb {
+  border-radius: var(--r-sm); padding: 14px 16px; margin-top: 12px;
+  font-size: 14px; line-height: 1.6; display: none; animation: up 0.25s ease;
+}
+.ai-fb.show { display: block; }
+.ai-fb.ok { background: var(--grass-pale); border-left: 4px solid var(--grass); }
+.ai-fb.fix { background: var(--sun-pale); border-left: 4px solid var(--sun); }
+.ai-fb strong { display: block; font-size: 15px; margin-bottom: 4px; }
+.ai-fb.ok strong { color: var(--grass); }
+.ai-fb.fix strong { color: #A06B00; }
+.dots span { display: inline-block; animation: dot 1.1s infinite; opacity: 0; }
+.dots span:nth-child(2) { animation-delay: 0.2s; }
+.dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dot { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+
+/* ── QUIZ ── */
+.quiz-top {
+  background: var(--white); border-radius: var(--r);
+  padding: 28px 20px 24px; box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border); margin-bottom: 18px; text-align: center;
+}
+.quiz-qlabel { font-size: 11px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 16px; }
+.quiz-big-pic { font-size: 100px; line-height: 1; margin-bottom: 10px; display: block; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.08)); }
+.quiz-cat { font-size: 12px; color: var(--ink-faint); margin-bottom: 18px; }
+.quiz-listen { display: flex; width: fit-content; margin: 0 auto 20px; }
+.q-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.q-opt {
+  min-height: 60px; padding: 12px 14px; border-radius: var(--r-sm);
+  border: 1.5px solid var(--border); background: var(--bg);
+  font-family: var(--font); font-size: 16px; font-weight: 700;
+  cursor: pointer; color: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.18s;
+}
+.q-opt:active:not(:disabled) { transform: scale(0.97); }
+.q-opt.correct { background: var(--grass-pale); border-color: var(--grass); color: var(--grass); }
+.q-opt.wrong { background: var(--coral-pale); border-color: var(--coral); color: var(--coral); }
+.q-opt:disabled { cursor: default; }
+
+.score-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.score-box { background: var(--white); border-radius: var(--r-sm); padding: 18px 16px; text-align: center; box-shadow: var(--shadow); border: 1px solid var(--border); }
+.score-num { font-family: var(--font-serif); font-size: 40px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+.score-box.ok .score-num { color: var(--grass); }
+.score-box.miss .score-num { color: var(--coral); }
+.score-lbl { font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-faint); }
+.streak-row { text-align: center; margin-top: 12px; font-size: 13px; color: var(--ink-faint); font-weight: 600; }
+.streak-row strong { color: var(--sun); }
+</style>
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans">
+<body>
 
-    <header class="p-6 bg-white shadow-sm flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-blue-600">FulForm Health</h1>
-        <nav>
-            <a href="/efficiency" class="text-slate-500 hover:text-blue-600 transition">General Business Solutions →</a>
-        </nav>
-    </header>
+<header>
+  <div class="logo">Word<em>Bridge</em></div>
+  <div class="hdr-right">
+    <div class="offline-dot" id="offline-dot"></div>
+    <span class="known-pill" id="known-pill">★ 0</span>
+  </div>
+</header>
 
-    <section class="max-w-4xl mx-auto mt-20 text-center px-4">
-        <h2 class="text-5xl font-extrabold tracking-tight">Stop Wasting Time on Paperwork.</h2>
-        <p class="mt-4 text-xl text-slate-600">Custom Power Platform solutions for Louisville clinics. HIPAA-ready, mobile-first, and fully automated.</p>
-    </section>
+<!-- ══ FLASHCARDS ══ -->
+<div class="view active" id="view-cards">
+  <div class="slabel">Topic</div>
+  <div class="cat-scroll" id="cat-scroll"></div>
 
-    <main class="max-w-6xl mx-auto mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 px-4 pb-20">
-        
-        <div class="bg-white p-8 rounded-2xl shadow-md border border-slate-100">
-            <h3 class="text-xl font-bold italic">Patient Intake + OCR</h3>
-            <p class="mt-2 text-slate-600">Scan insurance cards and fill history on an iPad. Data flows directly to your dashboard.</p>
-            <div class="mt-6 bg-slate-200 h-48 rounded-xl flex items-center justify-center text-slate-400 text-sm">
-                [Insert Screen Recording Video Here]
-            </div>
-        </div>
+  <div class="prog-row">
+    <span class="prog-text" id="prog-text">1 of 8</span>
+    <span class="prog-text" id="prog-pct">0%</span>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
 
-        <div class="bg-white p-8 rounded-2xl shadow-md border border-slate-100">
-            <h3 class="text-xl font-bold italic">Compliance Tracker</h3>
-            <p class="mt-2 text-slate-600">Automatic alerts for staff certifications and license renewals. Never miss a deadline.</p>
-            <div class="mt-6 bg-slate-200 h-48 rounded-xl flex items-center justify-center text-slate-400 text-sm">
-                [Insert Screen Recording Video Here]
-            </div>
-        </div>
+  <div class="card-wrap" onclick="flipCard()">
+    <div class="card-inner" id="card-inner">
+      <!-- FRONT: big picture + word -->
+      <div class="card-face card-front">
+        <div class="card-cat-tag" id="f-cat">Food</div>
+        <div class="card-picture" id="f-pic">🍎</div>
+        <div class="card-word" id="f-word">apple</div>
+        <button class="audio-btn" id="ab-front"
+          onclick="event.stopPropagation(); speak(currentItem().word,'ab-front')">
+          🔊 Say it
+        </button>
+        <div class="card-hint">Tap card to hear it used in a sentence →</div>
+      </div>
+      <!-- BACK: picture + word + phonetic + example -->
+      <div class="card-face card-back" id="card-back" data-col="food">
+        <div class="back-pic-sm" id="b-pic-sm">🍎</div>
+        <div class="back-word" id="b-word">apple</div>
+        <div class="back-phon" id="b-phon">/ˈæp.əl/</div>
+        <div class="back-example" id="b-ex">"I eat an apple every morning."</div>
+        <button class="audio-btn light" id="ab-back"
+          onclick="event.stopPropagation(); speak(currentItem().example,'ab-back')">
+          🔊 Example
+        </button>
+      </div>
+    </div>
+  </div>
 
-    </main>
+  <div class="card-controls">
+    <button class="ctrl-btn" onclick="nav(-1)">←</button>
+    <button class="knew-btn" onclick="markKnown()">✓ Got it!</button>
+    <button class="ctrl-btn" onclick="nav(1)">→</button>
+  </div>
+</div>
 
+<!-- ══ SENTENCE BUILDER ══ -->
+<div class="view" id="view-sentences">
+  <div class="sb-card">
+    <h3>Build a sentence</h3>
+    <p>Tap words to put them in the right order.</p>
+    <div class="sb-prompt-box">
+      <div class="sb-prompt-pic" id="sb-pic">🍎</div>
+      <div class="sb-prompt-text">
+        Make a sentence about this picture.
+        <em id="sb-hint">Tip: Subject first, then verb.</em>
+      </div>
+    </div>
+    <div class="word-bank" id="word-bank"></div>
+    <div class="sent-drop" id="sent-drop">
+      <span class="drop-ph">Tap words above to build your sentence…</span>
+    </div>
+    <div class="sb-actions">
+      <button class="btn-check" id="check-btn" onclick="checkSentence()" disabled>Check ✦</button>
+      <button class="btn-sec" onclick="clearSent()">Clear</button>
+      <button class="btn-sec" onclick="newChallenge()">New ↻</button>
+    </div>
+    <div class="ai-fb" id="ai-fb">
+      <strong id="fb-title"></strong>
+      <span id="fb-body"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ QUIZ ══ -->
+<div class="view" id="view-quiz">
+  <div class="quiz-top">
+    <div class="quiz-qlabel">What word matches this picture?</div>
+    <span class="quiz-big-pic" id="q-pic">🍎</span>
+    <div class="quiz-cat" id="q-cat">Food</div>
+    <button class="audio-btn quiz-listen" onclick="speak(currentQuizWord?.word)">🔊 Listen</button>
+    <div class="q-opts" id="q-opts"></div>
+  </div>
+  <div class="score-row">
+    <div class="score-box ok"><div class="score-num" id="sc-ok">0</div><div class="score-lbl">Correct</div></div>
+    <div class="score-box miss"><div class="score-num" id="sc-miss">0</div><div class="score-lbl">Missed</div></div>
+  </div>
+  <div class="streak-row">🔥 Streak: <strong id="streak-num">0</strong></div>
+</div>
+
+<nav>
+  <button class="nb active" onclick="switchView('cards',this)"><span class="nb-icon">🃏</span><span class="nb-label">Cards</span></button>
+  <button class="nb" onclick="switchView('sentences',this)"><span class="nb-icon">✏️</span><span class="nb-label">Sentences</span></button>
+  <button class="nb" onclick="switchView('quiz',this)"><span class="nb-icon">🧠</span><span class="nb-label">Quiz</span></button>
+</nav>
+
+<script>
+// ════════════════════════════════════════════════════
+// VOCAB DATA  (emoji + word + phonetic + example only)
+// ════════════════════════════════════════════════════
+const VOCAB = {
+  "🍎 Food": { col:"food", words:[
+    {word:"apple",   emoji:"🍎", ph:"/ˈæp.əl/",        ex:"I eat an apple every morning."},
+    {word:"bread",   emoji:"🍞", ph:"/brɛd/",           ex:"She bought a loaf of bread."},
+    {word:"water",   emoji:"💧", ph:"/ˈwɔː.tər/",       ex:"Please bring me a glass of water."},
+    {word:"chicken", emoji:"🍗", ph:"/ˈtʃɪk.ɪn/",      ex:"We had chicken for dinner."},
+    {word:"rice",    emoji:"🍚", ph:"/raɪs/",           ex:"He cooked rice with vegetables."},
+    {word:"banana",  emoji:"🍌", ph:"/bəˈnɑː.nə/",     ex:"She peeled the banana."},
+    {word:"milk",    emoji:"🥛", ph:"/mɪlk/",           ex:"I add milk to my coffee."},
+    {word:"egg",     emoji:"🥚", ph:"/ɛɡ/",             ex:"I boiled two eggs for breakfast."},
+    {word:"orange",  emoji:"🍊", ph:"/ˈɒr.ɪndʒ/",     ex:"She drank a glass of orange juice."},
+    {word:"pizza",   emoji:"🍕", ph:"/ˈpiːt.sə/",      ex:"We ordered pizza on Friday night."},
+  ]},
+  "🏠 Home": { col:"home", words:[
+    {word:"door",    emoji:"🚪", ph:"/dɔːr/",           ex:"Please close the door behind you."},
+    {word:"window",  emoji:"🪟", ph:"/ˈwɪn.dəʊ/",      ex:"Open the window — it is hot."},
+    {word:"chair",   emoji:"🪑", ph:"/tʃɛr/",           ex:"She sat down in the chair."},
+    {word:"bed",     emoji:"🛏️", ph:"/bɛd/",            ex:"He went to bed at ten."},
+    {word:"sofa",    emoji:"🛋️", ph:"/ˈsoʊ.fə/",       ex:"We sat on the sofa and watched TV."},
+    {word:"lamp",    emoji:"💡", ph:"/læmp/",           ex:"Turn on the lamp — it is dark."},
+    {word:"key",     emoji:"🔑", ph:"/kiː/",            ex:"I forgot my key inside."},
+    {word:"table",   emoji:"🪵", ph:"/ˈteɪ.bəl/",      ex:"Put the books on the table."},
+  ]},
+  "🚗 Travel": { col:"travel", words:[
+    {word:"bus",      emoji:"🚌", ph:"/bʌs/",            ex:"I take the bus to work every day."},
+    {word:"car",      emoji:"🚗", ph:"/kɑːr/",           ex:"She drives her car every day."},
+    {word:"airplane", emoji:"✈️", ph:"/ˈɛr.pleɪn/",     ex:"The airplane lands at noon."},
+    {word:"train",    emoji:"🚆", ph:"/treɪn/",          ex:"We took the train to the city."},
+    {word:"bicycle",  emoji:"🚲", ph:"/ˈbaɪ.sɪ.kəl/",  ex:"He rides his bicycle to school."},
+    {word:"ticket",   emoji:"🎫", ph:"/ˈtɪk.ɪt/",      ex:"Did you buy your ticket?"},
+    {word:"map",      emoji:"🗺️", ph:"/mæp/",            ex:"She looked at the map carefully."},
+    {word:"suitcase", emoji:"🧳", ph:"/ˈsuːt.keɪs/",    ex:"Pack your suitcase tonight."},
+  ]},
+  "🐶 Animals": { col:"animals", words:[
+    {word:"dog",     emoji:"🐶", ph:"/dɒɡ/",            ex:"The dog runs in the park."},
+    {word:"cat",     emoji:"🐱", ph:"/kæt/",            ex:"The cat sits on the chair."},
+    {word:"bird",    emoji:"🐦", ph:"/bɜːrd/",          ex:"A bird sang outside my window."},
+    {word:"fish",    emoji:"🐟", ph:"/fɪʃ/",            ex:"She has a fish in a bowl."},
+    {word:"rabbit",  emoji:"🐰", ph:"/ˈræb.ɪt/",       ex:"The rabbit ate a carrot."},
+    {word:"horse",   emoji:"🐴", ph:"/hɔːrs/",          ex:"The horse runs very fast."},
+    {word:"cow",     emoji:"🐄", ph:"/kaʊ/",            ex:"The cow gives us milk."},
+    {word:"duck",    emoji:"🦆", ph:"/dʌk/",            ex:"The duck swam in the lake."},
+  ]},
+  "🌦️ Weather": { col:"weather", words:[
+    {word:"sunny",   emoji:"☀️", ph:"/ˈsʌn.i/",         ex:"It is sunny today — let's go outside!"},
+    {word:"rain",    emoji:"🌧️", ph:"/reɪn/",           ex:"Bring your umbrella — it will rain."},
+    {word:"snow",    emoji:"❄️", ph:"/snoʊ/",            ex:"The children played in the snow."},
+    {word:"wind",    emoji:"💨", ph:"/wɪnd/",           ex:"The wind blew my hat away."},
+    {word:"cloud",   emoji:"☁️", ph:"/klaʊd/",           ex:"There are many clouds today."},
+    {word:"hot",     emoji:"🌡️", ph:"/hɒt/",            ex:"It is very hot in July."},
+    {word:"cold",    emoji:"🥶", ph:"/koʊld/",           ex:"Wear a coat — it is cold outside."},
+    {word:"umbrella",emoji:"☂️", ph:"/ʌmˈbrɛl.ə/",     ex:"She opened her umbrella in the rain."},
+  ]},
+  "💼 Work": { col:"work", words:[
+    {word:"computer",emoji:"💻", ph:"/kəmˈpjuː.tər/",   ex:"She works on her computer all day."},
+    {word:"phone",   emoji:"📱", ph:"/foʊn/",            ex:"He answered his phone quickly."},
+    {word:"pen",     emoji:"🖊️", ph:"/pɛn/",             ex:"Sign your name with a pen."},
+    {word:"paper",   emoji:"📄", ph:"/ˈpeɪ.pər/",       ex:"Write your name on the paper."},
+    {word:"money",   emoji:"💵", ph:"/ˈmʌn.i/",         ex:"She earned money at her job."},
+    {word:"book",    emoji:"📖", ph:"/bʊk/",             ex:"She reads a book every night."},
+    {word:"clock",   emoji:"🕐", ph:"/klɒk/",            ex:"Look at the clock — it is noon."},
+    {word:"bag",     emoji:"👜", ph:"/bæɡ/",             ex:"He put his lunch in his bag."},
+  ]},
+  "👕 Clothes": { col:"clothes", words:[
+    {word:"shirt",  emoji:"👕", ph:"/ʃɜːrt/",           ex:"He wore a blue shirt today."},
+    {word:"pants",  emoji:"👖", ph:"/pænts/",           ex:"She put on her pants and left."},
+    {word:"shoes",  emoji:"👟", ph:"/ʃuːz/",            ex:"Tie your shoes before you go."},
+    {word:"hat",    emoji:"🧢", ph:"/hæt/",             ex:"He wore a hat in the sun."},
+    {word:"coat",   emoji:"🧥", ph:"/koʊt/",            ex:"Put on your coat — it is cold."},
+    {word:"dress",  emoji:"👗", ph:"/drɛs/",            ex:"She wore a pretty dress."},
+    {word:"socks",  emoji:"🧦", ph:"/sɒks/",            ex:"He lost one of his socks."},
+    {word:"gloves", emoji:"🧤", ph:"/ɡlʌvz/",          ex:"Wear your gloves in the snow."},
+  ]},
+};
+
+const CHALLENGES = [
+  {emoji:"🐶",words:["The","dog","runs","in","the","park"],    answer:"The dog runs in the park",       hint:"Subject → Verb → Where"},
+  {emoji:"☀️",words:["It","is","sunny","today"],               answer:"It is sunny today",              hint:"It + is + adjective + time"},
+  {emoji:"🍎",words:["I","eat","an","apple","every","morning"],answer:"I eat an apple every morning",   hint:"Subject → Verb → Object → When"},
+  {emoji:"🚌",words:["I","take","the","bus","to","work"],      answer:"I take the bus to work",         hint:"Subject → Verb → Object → Where"},
+  {emoji:"💧",words:["Please","bring","me","a","glass","of","water"],answer:"Please bring me a glass of water",hint:"Please + Verb → Who → What"},
+  {emoji:"📱",words:["He","answered","his","phone","quickly"], answer:"He answered his phone quickly",  hint:"Subject → Verb → Object → How"},
+  {emoji:"🧥",words:["Put","on","your","coat"],                answer:"Put on your coat",               hint:"Verb + on → Possessive → Object"},
+  {emoji:"🐱",words:["The","cat","sits","on","the","chair"],   answer:"The cat sits on the chair",      hint:"Subject → Verb → Where"},
+  {emoji:"🧳",words:["Pack","your","suitcase","tonight"],      answer:"Pack your suitcase tonight",     hint:"Command → Object → When"},
+  {emoji:"📖",words:["She","reads","a","book","every","night"],answer:"She reads a book every night",   hint:"Subject → Verb → Object → When"},
+];
+
+// ════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════
+const catKeys = Object.keys(VOCAB);
+let activeCat = catKeys[0];
+let cardIdx = 0, isFlipped = false;
+let knownSet = new Set(JSON.parse(localStorage.getItem('wb_known')||'[]'));
+let qOk=0, qMiss=0, streak=0, qLocked=false;
+let currentQuizWord=null, challenge=null, placed=[];
+let isOnline = navigator.onLine;
+
+const $=id=>document.getElementById(id);
+const catData=()=>VOCAB[activeCat];
+const currentItem=()=>catData().words[cardIdx];
+const allWords=()=>catKeys.flatMap(k=>VOCAB[k].words);
+
+function saveKnown(){ localStorage.setItem('wb_known',JSON.stringify([...knownSet])); $('known-pill').textContent=`★ ${knownSet.size}`; }
+
+// ════════════════════════════════════════════════════
+// SPEECH
+// ════════════════════════════════════════════════════
+function speak(text,btnId){
+  if(!window.speechSynthesis||!text)return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='en-US'; u.rate=0.82; u.pitch=1;
+  if(btnId){const b=$(btnId);if(b){b.classList.add('speaking');u.onend=()=>b.classList.remove('speaking');}}
+  speechSynthesis.speak(u);
+}
+
+// ════════════════════════════════════════════════════
+// FLASHCARDS
+// ════════════════════════════════════════════════════
+function buildCats(){
+  const sc=$('cat-scroll'); sc.innerHTML='';
+  catKeys.forEach(cat=>{
+    const b=document.createElement('button');
+    b.className='cat-chip'+(cat===activeCat?' active':'');
+    b.textContent=cat;
+    b.onclick=()=>{activeCat=cat;cardIdx=0;isFlipped=false;$('card-inner').classList.remove('flipped');buildCats();renderCard();};
+    sc.appendChild(b);
+  });
+}
+
+function renderCard(){
+  const words=catData().words, item=words[cardIdx];
+  const pct=Math.round((cardIdx/Math.max(words.length-1,1))*100);
+  const label=activeCat.split(' ').slice(1).join(' ');
+  $('f-cat').textContent=label;
+  $('f-pic').textContent=item.emoji;
+  $('f-word').textContent=item.word;
+  $('b-pic-sm').textContent=item.emoji;
+  $('b-word').textContent=item.word;
+  $('b-phon').textContent=item.ph;
+  $('b-ex').textContent=`"${item.ex}"`;
+  $('card-back').dataset.col=catData().col;
+  $('prog-text').textContent=`${cardIdx+1} of ${words.length}`;
+  $('prog-pct').textContent=pct+'%';
+  $('prog-fill').style.width=pct+'%';
+}
+
+function flipCard(){
+  isFlipped=!isFlipped;
+  $('card-inner').classList.toggle('flipped',isFlipped);
+  if(isFlipped) speak(currentItem().ex,'ab-back');
+}
+
+function nav(dir){
+  const w=catData().words;
+  cardIdx=(cardIdx+dir+w.length)%w.length;
+  isFlipped=false; $('card-inner').classList.remove('flipped'); renderCard();
+}
+
+function markKnown(){ knownSet.add(currentItem().word); saveKnown(); nav(1); }
+
+// ════════════════════════════════════════════════════
+// SENTENCE BUILDER
+// ════════════════════════════════════════════════════
+function newChallenge(){
+  challenge=CHALLENGES[Math.floor(Math.random()*CHALLENGES.length)];
+  placed=[];
+  $('sb-pic').textContent=challenge.emoji;
+  $('sb-hint').textContent='Tip: '+challenge.hint;
+  const sh=[...challenge.words].sort(()=>Math.random()-0.5);
+  const bank=$('word-bank'); bank.innerHTML='';
+  sh.forEach(w=>{
+    const el=document.createElement('div');
+    el.className='w-chip'; el.textContent=w; el.dataset.w=w;
+    el.onclick=()=>placeWord(el); bank.appendChild(el);
+  });
+  renderDrop(); $('ai-fb').className='ai-fb';
+}
+
+function placeWord(el){
+  if(el.classList.contains('used'))return;
+  el.classList.add('used'); placed.push({word:el.dataset.w,el}); renderDrop();
+}
+function removeWord(i){ placed.splice(i,1)[0].el.classList.remove('used'); renderDrop(); }
+
+function renderDrop(){
+  const drop=$('sent-drop'); drop.innerHTML='';
+  if(!placed.length){
+    drop.classList.remove('has');
+    const ph=document.createElement('span'); ph.className='drop-ph'; ph.textContent='Tap words above to build your sentence…';
+    drop.appendChild(ph); $('check-btn').disabled=true; return;
+  }
+  drop.classList.add('has');
+  placed.forEach((p,i)=>{
+    const el=document.createElement('div'); el.className='p-chip';
+    el.innerHTML=`${p.word} <span class="x">✕</span>`; el.onclick=()=>removeWord(i); drop.appendChild(el);
+  });
+  $('check-btn').disabled=false;
+}
+
+function clearSent(){ placed=[]; document.querySelectorAll('.w-chip').forEach(c=>c.classList.remove('used')); renderDrop(); }
+
+async function checkSentence(){
+  const formed=placed.map(p=>p.word).join(' ');
+  const fb=$('ai-fb');
+  $('fb-title').textContent='Checking…';
+  $('fb-body').innerHTML='<span class="dots"><span>•</span><span>•</span><span>•</span></span>';
+  fb.className='ai-fb show ok'; $('check-btn').disabled=true;
+  const isOk=formed.toLowerCase().replace(/[—–]/g,'').trim()===challenge.answer.toLowerCase().replace(/[—–]/g,'').trim();
+  if(!isOnline){
+    fb.className='ai-fb show '+(isOk?'ok':'fix');
+    $('fb-title').textContent=isOk?'✓ Correct!':'↩ Not quite';
+    $('fb-body').textContent=isOk?`Great! "${formed}" is correct.`:`Try: "${challenge.answer}" — ${challenge.hint}`;
+    $('check-btn').disabled=false; return;
+  }
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:160,
+        system:"You are a warm ESL teacher for adult beginners. Two short sentences max. If correct: confirm and name one grammar pattern. If wrong: gently correct and show the right order. Very simple English only.",
+        messages:[{role:"user",content:`Student wrote: "${formed}". Correct: "${challenge.answer}". Hint: ${challenge.hint}.`}]})
+    });
+    const data=await res.json();
+    const text=data.content?.find(b=>b.type==='text')?.text||'';
+    fb.className='ai-fb show '+(isOk?'ok':'fix');
+    $('fb-title').textContent=isOk?'✓ Well done!':'↩ Almost!';
+    $('fb-body').textContent=text||(isOk?'Correct!':` Try: "${challenge.answer}"`);
+  }catch{
+    fb.className='ai-fb show '+(isOk?'ok':'fix');
+    $('fb-title').textContent=isOk?'✓ Correct!':'↩ Not quite';
+    $('fb-body').textContent=isOk?'That is correct!':`Try: "${challenge.answer}" — ${challenge.hint}`;
+  }
+  $('check-btn').disabled=false;
+}
+
+// ════════════════════════════════════════════════════
+// QUIZ  — see picture, pick the word
+// ════════════════════════════════════════════════════
+function renderQuiz(){
+  if(qLocked)return;
+  const pool=allWords();
+  const sh=[...pool].sort(()=>Math.random()-0.5);
+  currentQuizWord=sh[0];
+  const catName=catKeys.find(k=>VOCAB[k].words.find(w=>w.word===currentQuizWord.word))||'';
+  $('q-pic').textContent=currentQuizWord.emoji;
+  $('q-cat').textContent=catName.split(' ').slice(1).join(' ');
+  const opts=[currentQuizWord.word,...sh.slice(1,4).map(w=>w.word)].sort(()=>Math.random()-0.5);
+  const c=$('q-opts'); c.innerHTML='';
+  opts.forEach(opt=>{
+    const b=document.createElement('button'); b.className='q-opt'; b.textContent=opt;
+    b.onclick=()=>answerQuiz(b,opt===currentQuizWord.word); c.appendChild(b);
+  });
+}
+
+function answerQuiz(btn,correct){
+  if(qLocked)return; qLocked=true;
+  document.querySelectorAll('.q-opt').forEach(b=>{b.disabled=true;if(b.textContent===currentQuizWord.word)b.classList.add('correct');});
+  if(!correct){btn.classList.add('wrong');qMiss++;streak=0;$('sc-miss').textContent=qMiss;}
+  else{qOk++;streak++;$('sc-ok').textContent=qOk;}
+  $('streak-num').textContent=streak;
+  setTimeout(()=>{qLocked=false;renderQuiz();},1400);
+}
+
+// ════════════════════════════════════════════════════
+// VIEW SWITCHING
+// ════════════════════════════════════════════════════
+function switchView(name,btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  $('view-'+name).classList.add('active'); btn.classList.add('active');
+  if(name==='quiz')renderQuiz();
+}
+
+// ════════════════════════════════════════════════════
+// ONLINE / OFFLINE
+// ════════════════════════════════════════════════════
+function updateOnline(){ isOnline=navigator.onLine; $('offline-dot').classList.toggle('show',!isOnline); }
+window.addEventListener('online',updateOnline);
+window.addEventListener('offline',updateOnline);
+updateOnline();
+
+// ════════════════════════════════════════════════════
+// SERVICE WORKER
+// ════════════════════════════════════════════════════
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+$('known-pill').textContent=`★ ${knownSet.size}`;
+buildCats(); renderCard(); newChallenge();
+</script>
 </body>
 </html>
